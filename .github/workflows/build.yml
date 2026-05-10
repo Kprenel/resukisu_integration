@@ -33,13 +33,16 @@ jobs:
       run: |
         mkdir ./kernel && cd ./kernel
 
-        repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android15-6.6
+        repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android15-6.6-2024-09
 
-        repo --trace sync -c -j$(nproc --all) --fail-fast
+        repo --trace sync -c -j$(nproc --all) --
+               ↪ no-tags --fail-fast
 
         cd ./common
+        
+        git fetch https://android.googlesource.com/kernel/common refs/tags/android15-6.6-2024-10_r31
 
-        git checkout android15-6.6-2024-10_r31
+        git checkout -b android15-6.6-2024-10_r31 FETCH_HEAD
         
     - name: ksu_integration
       run: |
