@@ -35,11 +35,11 @@ jobs:
 
         repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android15-6.6
 
-        repo --trace sync -c -j$(nproc --all) --no-tags --fail-fast
+        repo --trace sync -c -j$(nproc --all) --fail-fast
 
         cd ./common
 
-        git checkout android15-6.6-2024-10_r1
+        git checkout android15-6.6-2024-10_r31
         
     - name: ksu_integration
       run: |
