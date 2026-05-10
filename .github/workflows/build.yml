@@ -33,7 +33,7 @@ jobs:
       run: |
         mkdir ./kernel && cd ./kernel
 
-        repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android15-6.6-2024-09
+        repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android15-6.6
 
         repo --trace sync -c -j$(nproc --all) --
                ↪ no-tags --fail-fast
