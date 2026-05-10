@@ -32,8 +32,8 @@ jobs:
     - name: get_kernel
       run: |
         mkdir ./kernel && cd ./kernel
-
-        repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android15-6.6-2024-09
+        
+        repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android15-6.6
 
         repo sync -c --no-tags -j$(nproc)
 
@@ -89,11 +89,13 @@ jobs:
         
     - name: add_post_defconfig
       run: |
-        cd "$KERNEL"
+        cd "$KERNEL/common"
         
-        printf "POST_DEFCONFIG_CMDS='\${ROOT_DIR}/common/scripts/config --file \${OUT_DIR}/.config -e CONFIG_KSU_SUSFS -e CONFIG_KSU_TOOLKIT_SUPPORT -e CONFIG_KPM && make -C \${ROOT_DIR}/common O=\${OUT_DIR} olddefconfig'\n" >> "./common/build.config.gki.aarch64"
-        
-        tail -3 "./common/build.config.gki.aarch64"
+        cat >> arch/arm64/configs/gki_defconfig << 'EOF'
+        CONFIG_KSU_SUSFS=y
+        CONFIG_KSU_TOOLKIT_SUPPORT=y
+        CONFIG_KPM=y
+        EOF
     
     - name: build_compile
       run: |
@@ -101,7 +103,7 @@ jobs:
         
         set -euo pipefail
         
-        SKIP_MRPROPER=1 LTO=thin SKIP_EXT_MODULES=1 SKIP_CP_KERNEL_HDR=1 BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh 2>&1 | tee build.log
+        tools/bazel build --config=fast --lto=thin //common:kernel_aarch64
   
     - name: check_config_after_build
       run: |
