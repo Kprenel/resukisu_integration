@@ -68,7 +68,11 @@ jobs:
         # 
         cd ../common
         patch -p1 < 50_add_susfs_in_gki-android15-6.6.patch
-        
+
+        patch -p1 < "${{ github.workspace }}/base.c.patch" || true
+
+        patch -p1 < "${{ github.workspace }}/task_mmu.c.patch" || true
+                  
     - name: fix_wifi
       run: |
         cd "$KERNEL"
