@@ -37,7 +37,7 @@ jobs:
 
         repo sync -c --no-tags -j$(nproc)
 
-        git -C common fetch origin refs/tags/android15-6.6.50_r00
+        git fetch https://android.googlesource.com/kernel/common refs/tags/android15-6.6.50_r00
         git -C common checkout android15-6.6.50_r00
         
     - name: ksu_integration
