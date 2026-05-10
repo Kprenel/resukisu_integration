@@ -1,0 +1,131 @@
+name: ksu_integration
+
+on:
+  push:
+    branches: [main]
+
+env:
+  KERNEL: "${{ github.workspace }}/kernel"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: free_disk_space       
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: false
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: true
+        swap-storage: true
+    
+    - name: install_packages
+      run: |
+        sudo apt-get install -y git-core gnupg flex bison build-essential zip curl zlib1g-dev libc6-dev-i386 libxml2-utils xsltproc unzip fontconfig repo
+          
+    - name: get_kernel
+      run: |
+        mkdir ./kernel && cd ./kernel
+
+        repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android13-5.10-2024-11
+        
+        repo --trace sync -c -j$(nproc --all) --no-tags --fail-fast
+        
+    - name: ksu_integration
+      run: |
+        cd "$KERNEL/common"
+        
+        curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/susfs-ksud/kernel/setup.sh" | bash
+        
+    - name: susfs_integration
+      run: |
+        cd "$KERNEL"
+        
+        git clone -b gki-android13-5.10 --single-branch https://gitlab.com/simonpunk/susfs4ksu.git
+        
+        cd ./susfs4ksu
+        #cp ./kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ../KernelSU
+        # 
+        cp -r ./kernel_patches/50_add_susfs_in_gki-android13-5.10.patch ../common/
+        
+        cp -r ./kernel_patches/fs/* ../common/fs/
+        cp -r ./kernel_patches/include/linux/* ../common/include/linux/
+        
+        #cd ../KernelSU
+        #patch -p1 < 10_enable_susfs_for_ksu.patch
+        # 
+        cd ../common
+        patch -p1 < 50_add_susfs_in_gki-android13-5.10.patch
+        
+    - name: fix_wifi
+      run: |
+        cd "$KERNEL"
+        
+        rm -rf ./common/android/abi_gki_protected_exports_aarch64
+        rm -rf ./common/android/abi_gki_protected_exports_x86_64
+        
+    - name: fix_erros
+      run: |
+        cd "$KERNEL"
+        
+        sed -i 's/vm_flags_clear(new_vma, VM_PAD_MASK);/new_vma->vm_flags \&= ~VM_PAD_MASK;/' ./common/mm/mmap.c
+        
+        echo 'CFLAGS_susfs.o += -Wno-unused-function -Wno-unused-variable' >> ./common/fs/Makefile
+        
+        # export symbols
+        printf '\nEXPORT_SYMBOL(susfs_is_current_ksu_domain);\nEXPORT_SYMBOL(susfs_is_current_zygote_domain);\nEXPORT_SYMBOL(susfs_is_current_init_domain);\n' >> ./common/drivers/kernelsu/selinux/selinux.c
+        
+    - name: add_post_defconfig
+      run: |
+        cd "$KERNEL"
+        
+        printf "POST_DEFCONFIG_CMDS='\${ROOT_DIR}/common/scripts/config --file \${OUT_DIR}/.config -e CONFIG_KSU_SUSFS -e CONFIG_KSU_TOOLKIT_SUPPORT -e CONFIG_KPM && make -C \${ROOT_DIR}/common O=\${OUT_DIR} olddefconfig'\n" >> "./common/build.config.gki.aarch64"
+        
+        tail -3 "./common/build.config.gki.aarch64"
+    
+    - name: build_compile
+      run: |
+        cd "$KERNEL"
+        
+        set -euo pipefail
+        
+        SKIP_MRPROPER=1 LTO=thin SKIP_EXT_MODULES=1 SKIP_CP_KERNEL_HDR=1 BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh 2>&1 | tee build.log
+  
+    - name: check_config_after_build
+      run: |
+        cd "$KERNEL"
+        
+        grep "KSU\|SUSFS\|KPM" ./out/android13-5.10/common/.config 2>/dev/null || echo "NAO ENCONTRADO"
+        
+    - name: finde_image
+      run: |
+        cd "$KERNEL"
+        find ./out -name "Image" -o -name "Image.gz" -o -name "Image.lz4" 2>/dev/null
+    
+    - name: create_anykernel3
+      run: |
+        cd ${{ github.workspace }}
+        
+        git clone https://github.com/osm0sis/AnyKernel3 anykernel3
+        
+        cp "$KERNEL/out/android13-5.10/dist/Image" ./anykernel3
+        
+        cd anykernel3
+        
+        cp "${{ github.workspace  }}/anykernel.sh" ./
+        
+        zip -r9 ../ReSukiSU.zip . -x "*.git*"
+        
+    - name: upload_anykernel3
+      uses: actions/upload-artifact@v4
+      with:
+        name: ReSukiSU-AnyKernel3
+        path: ${{ github.workspace }}/ReSukiSU.zip
+    
+
