@@ -39,7 +39,7 @@ jobs:
 
         cd ./common
 
-        git checkout android15-6.6-2024-10_r31
+        git checkout android15-6.6-2024-10_r1
         
     - name: ksu_integration
       run: |
