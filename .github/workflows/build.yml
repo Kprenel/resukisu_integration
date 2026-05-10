@@ -37,6 +37,8 @@ jobs:
 
         repo sync -c --no-tags -j$(nproc)
 
+        cd ./common
+
         git fetch https://android.googlesource.com/kernel/common refs/tags/android15-6.6.50_r00
 
         git checkout -b android15-6.6.50 FETCH_HEAD
@@ -105,7 +107,7 @@ jobs:
       run: |
         cd "$KERNEL"
         
-        grep "KSU\|SUSFS\|KPM" ./out/android13-5.10/common/.config 2>/dev/null || echo "NAO ENCONTRADO"
+        grep "KSU\|SUSFS\|KPM" ./out/android15-6.6/common/.config 2>/dev/null || echo "NAO ENCONTRADO"
         
     - name: finde_image
       run: |
@@ -118,7 +120,7 @@ jobs:
         
         git clone https://github.com/osm0sis/AnyKernel3 anykernel3
         
-        cp "$KERNEL/out/android13-5.10/dist/Image" ./anykernel3
+        cp "$KERNEL/out/android15-6.6/dist/Image" ./anykernel3
         
         cd anykernel3
         
