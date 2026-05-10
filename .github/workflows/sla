@@ -67,7 +67,9 @@ jobs:
         #patch -p1 < 10_enable_susfs_for_ksu.patch
         
         cd ../common
-        patch -p1 < 50_add_susfs_in_gki-android13-5.10.patch
+        patch -p1 < 50_add_susfs_in_gki-android13-5.10.patch || true
+
+        patch -p1 < "${{ github.workspace  }}/base.c.path"
         
     - name: fix_wifi
       run: |
