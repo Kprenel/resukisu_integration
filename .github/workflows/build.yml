@@ -33,15 +33,15 @@ jobs:
       run: |
         mkdir ./kernel && cd ./kernel
 
-        repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android15-6.6
+        repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android13-5.10
 
         repo --trace sync -c -j$(nproc --all) --no-tags --fail-fast
 
         cd ./common
-        
-        git fetch https://android.googlesource.com/kernel/common refs/tags/android15-6.6-2024-10_r31
 
-        git checkout -b android15-6.6-2024-10_r31 FETCH_HEAD
+        git fetch https://android.googlesource.com/kernel/common refs/tags/android13-5.10-2024-11_r6
+
+        git checkout -b android15-5.10-2024-11_r6 FETCH_HEAD
         
     - name: ksu_integration
       run: |
@@ -53,26 +53,24 @@ jobs:
       run: |
         cd "$KERNEL"
         
-        git clone -b gki-android15-6.6-dev --single-branch https://gitlab.com/simonpunk/susfs4ksu.git
+        git clone -b gki-android13-5.10 --single-branch https://gitlab.com/simonpunk/susfs4ksu.git
         
         cd ./susfs4ksu
+        
         #cp ./kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ../KernelSU
-        # 
-        cp -r ./kernel_patches/50_add_susfs_in_gki-android15-6.6.patch ../common/
+        
+        cp -r ./kernel_patches/50_add_susfs_in_gki-android13-5.10.patch ../common/
         
         cp -r ./kernel_patches/fs/* ../common/fs/
         cp -r ./kernel_patches/include/linux/* ../common/include/linux/
         
         #cd ../KernelSU
         #patch -p1 < 10_enable_susfs_for_ksu.patch
-        # 
+        
         cd ../common
-        patch -p1 < 50_add_susfs_in_gki-android15-6.6.patch
-
-        patch -p1 < "${{ github.workspace }}/base.c.patch" || true
-
-        patch -p1 < "${{ github.workspace }}/task_mmu.c.patch" || true
-                  
+        
+        patch -p1 < 50_add_susfs_in_gki-android13-5.10.patch || true
+        
     - name: fix_wifi
       run: |
         cd "$KERNEL"
@@ -93,13 +91,11 @@ jobs:
         
     - name: add_post_defconfig
       run: |
-        cd "$KERNEL/common"
+        cd "$KERNEL"
         
-        cat >> arch/arm64/configs/gki_defconfig << 'EOF'
-        CONFIG_KSU_SUSFS=y
-        CONFIG_KSU_TOOLKIT_SUPPORT=y
-        CONFIG_KPM=y
-        EOF
+        printf "POST_DEFCONFIG_CMDS='\${ROOT_DIR}/common/scripts/config --file \${OUT_DIR}/.config -e CONFIG_KSU_SUSFS -e CONFIG_KSU_TOOLKIT_SUPPORT -e CONFIG_KPM && make -C \${ROOT_DIR}/common O=\${OUT_DIR} olddefconfig'\n" >> "./common/build.config.gki.aarch64"
+        
+        tail -3 "./common/build.config.gki.aarch64"
     
     - name: build_compile
       run: |
@@ -107,13 +103,13 @@ jobs:
         
         set -euo pipefail
         
-        tools/bazel build --config=fast --lto=thin //common:kernel_aarch64
+        SKIP_MRPROPER=1 LTO=thin SKIP_EXT_MODULES=1 SKIP_CP_KERNEL_HDR=1 BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh 2>&1 | tee build.log
   
     - name: check_config_after_build
       run: |
         cd "$KERNEL"
         
-        grep "KSU\|SUSFS\|KPM" ./out/android15-6.6/common/.config 2>/dev/null || echo "NAO ENCONTRADO"
+        grep "KSU\|SUSFS\|KPM" ./out/android13-5.10/common/.config 2>/dev/null || echo "NAO ENCONTRADO"
         
     - name: finde_image
       run: |
@@ -126,7 +122,7 @@ jobs:
         
         git clone https://github.com/osm0sis/AnyKernel3 anykernel3
         
-        cp "$KERNEL/out/android15-6.6/dist/Image" ./anykernel3
+        cp "$KERNEL/out/android13-5.10/dist/Image" ./anykernel3
         
         cd anykernel3
         
