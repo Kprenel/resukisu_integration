@@ -56,6 +56,7 @@ jobs:
         git clone -b gki-android13-5.10 --single-branch https://gitlab.com/simonpunk/susfs4ksu.git
         
         cd ./susfs4ksu
+        
         #cp ./kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ../KernelSU
         
         cp -r ./kernel_patches/50_add_susfs_in_gki-android13-5.10.patch ../common/
@@ -67,6 +68,7 @@ jobs:
         #patch -p1 < 10_enable_susfs_for_ksu.patch
         
         cd ../common
+        
         patch -p1 < 50_add_susfs_in_gki-android13-5.10.patch || true
         
     - name: fix_wifi
