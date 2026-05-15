@@ -98,9 +98,15 @@ jobs:
     - name: add_post_defconfig
       run: |
         cd $KERNEL
-        
-        printf "POST_DEFCONFIG_CMDS='\${ROOT_DIR}/common/scripts/config --file \${OUT_DIR}/.config -e CONFIG_KSU_SUSFS -e CONFIG_KSU_TOOLKIT_SUPPORT -e CONFIG_KPM && make -C \${ROOT_DIR}/common O=\${OUT_DIR} olddefconfig'\n" >> "./common/build.config.gki.aarch64"
-        
+    
+        cat >> ./common/build.config.gki.aarch64 << 'EOF'
+        POST_DEFCONFIG_CMDS='${ROOT_DIR}/common/scripts/config --file ${OUT_DIR}/.config \
+            -e KSU_SUSFS \
+            -e KSU_TOOLKIT_SUPPORT \
+            -e KPM && \
+            make -C ${ROOT_DIR}/common O=${OUT_DIR} olddefconfig'
+        EOF
+    
         tail -5 "./common/build.config.gki.aarch64"
     
     - name: build_compile
