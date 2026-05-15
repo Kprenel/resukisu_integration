@@ -31,7 +31,7 @@ jobs:
           
     - name: get_kernel
       run: |
-        mkdir ./kernel && cd ./kernel
+        mkdir -p $KERNEL && cd $KERNEL
 
         repo init --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android13-5.10
 
@@ -87,15 +87,27 @@ jobs:
         echo 'CFLAGS_susfs.o += -Wno-unused-function -Wno-unused-variable' >> ./common/fs/Makefile
         
         # export symbols
-        printf '\nEXPORT_SYMBOL(susfs_is_current_ksu_domain);\nEXPORT_SYMBOL(susfs_is_current_zygote_domain);\nEXPORT_SYMBOL(susfs_is_current_init_domain);\n' >> ./common/drivers/kernelsu/selinux/selinux.c
+        cat >> ./common/drivers/kernelsu/selinux/selinux.c << 'EOF'
+        
+        EXPORT_SYMBOL(susfs_is_current_ksu_domain);
+        EXPORT_SYMBOL(susfs_is_current_zygote_domain);
+        EXPORT_SYMBOL(susfs_is_current_init_domain);
+        
+        EOF
         
     - name: add_post_defconfig
       run: |
         cd $KERNEL
         
-        printf "POST_DEFCONFIG_CMDS='\${ROOT_DIR}/common/scripts/config --file \${OUT_DIR}/.config -e CONFIG_KSU_SUSFS -e CONFIG_KSU_TOOLKIT_SUPPORT -e CONFIG_KPM && make -C \${ROOT_DIR}/common O=\${OUT_DIR} olddefconfig'\n" >> "./common/build.config.gki.aarch64"
+        cat >> ./common/build.config.gki.aarch64 << 'EOF'
+        POST_DEFCONFIG_CMDS='${ROOT_DIR}/common/scripts/config --file ${OUT_DIR}/.config \
+          -e CONFIG_KSU_SUSFS \
+          -e CONFIG_KSU_TOOLKIT_SUPPORT \
+          -e CONFIG_KPM && \
+          make -C ${ROOT_DIR}/common O=${OUT_DIR} olddefconfig'
+        EOF
         
-        tail -3 "./common/build.config.gki.aarch64"
+        tail -5 "./common/build.config.gki.aarch64"
     
     - name: build_compile
       run: |
@@ -103,7 +115,13 @@ jobs:
         
         set -euo pipefail
         
-        SKIP_MRPROPER=1 LTO=thin SKIP_EXT_MODULES=1 SKIP_CP_KERNEL_HDR=1 BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh 2>&1 | tee build.log
+        export SKIP_MRPROPER=1
+        export LTO=thin
+        export SKIP_EXT_MODULES=1
+        export SKIP_CP_KERNEL_HDR=1
+        export BUILD_CONFIG=common/build.config.gki.aarch64
+        
+        build/build.sh 2>&1 | tee build.log
   
     - name: check_config_after_build
       run: |
