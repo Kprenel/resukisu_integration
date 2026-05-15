@@ -64,7 +64,7 @@ jobs:
         
         cd ../common
         
-        patch -p1 < 50_add_susfs_in_gki-android13-5.10.patch || true
+        patch -p1 < 50_add_susfs_in_gki-android13-5.10.patch
         
     - name: fix_wifi
       run: |
@@ -72,14 +72,16 @@ jobs:
         
         rm -rf ./common/android/abi_gki_protected_exports_aarch64
         rm -rf ./common/android/abi_gki_protected_exports_x86_64
+
+    - name: fix_flags
+      run: |
+        sed -i 's/vm_flags_clear(new_vma,VM_PAD_MASK);/new_vma->vm_flags \&= ~VM_PAD_MASK;/g' ./common/mm/mmap.c
+
+        echo 'CFLAGS_susfs.o += -Wno-unused-function -Wno-unused-variable' >> ./common/fs/Makefile
         
-    - name: fix_erros
+    - name: fix_symbols
       run: |
         cd $KERNEL
-
-        sed -i 's/vm_flags_clear(new_vma, VM_PAD_MASK);/new_vma->vm_flags \&= ~VM_PAD_MASK;/g' ./common/mm/mmap.c
-        
-        echo 'CFLAGS_susfs.o += -Wno-unused-function -Wno-unused-variable' >> ./common/fs/Makefile
         
         # export symbols selinux.c
         cat >> ./common/drivers/kernelsu/selinux/selinux.c << 'EOF'
@@ -91,28 +93,12 @@ jobs:
         EXPORT_SYMBOL(fake_state);
         
         EOF
-
-    - name: create_ksu_fragment
-      run: |
-        cd ${{ github.workspace  }}
-
-        cat > ./ksu.fragment << 'EOF'
-        
-        CONFIG_KPM=y
-        CONFIG_KSU_SUSFS=y
-        CONFIG_KSU_TOOLKIT_SUPPORT=y
-        
-        EOF
         
     - name: configure_build
       run: |
-        cd $KERNEL
-        
-        sed -i '/^POST_DEFCONFIG_CMDS=/d' ./common/build.config.gki.aarch64
-        
-        echo 'POST_DEFCONFIG_CMDS="${ROOT_DIR}/common/scripts/kconfig/merge_config.sh -m ${OUT_DIR}/.config ${{ github.workspace  }}/ksu.fragment"' >> ./common/build.config.gki.aarch64
-        
-        grep "POST_DEFCONFIG_CMDS" ./common/build.config.gki.aarch64
+        cat > "${{ github.workspace }}/defconfig_wrapper.sh" << EOF
+        append_cmd POST_DEFCONFIG_CMDS 'if [ -f "${{ github.workspace }}/ksu.fragment" ]; then \${KERNEL_DIR}/scripts/kconfig/merge_config.sh -m -O \${OUT_DIR} \${OUT_DIR}/.config "${{ github.workspace }}/ksu.fragment"; fi && (cd \${KERNEL_DIR} && make O=\${OUT_DIR} olddefconfig)'
+        EOF
     
     - name: build_compile
       run: |
@@ -124,6 +110,7 @@ jobs:
         export LTO=thin
         export SKIP_EXT_MODULES=1
         export SKIP_CP_KERNEL_HDR=1
+        export GKI_DEFCONFIG_FRAGMENT="${{ github.workspace }}/defconfig_wrapper.sh"
         export BUILD_CONFIG=common/build.config.gki.aarch64
         
         build/build.sh 2>&1 | tee build.log
