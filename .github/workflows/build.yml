@@ -41,7 +41,7 @@ jobs:
 
         git fetch https://android.googlesource.com/kernel/common refs/tags/android13-5.10-2024-11_r31
 
-        git checkout -b android15-5.10-2024-11_r31 FETCH_HEAD
+        git checkout -b android13-5.10-2024-11_r31 FETCH_HEAD
         
     - name: ksu_integration
       run: |
