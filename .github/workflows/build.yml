@@ -83,8 +83,21 @@ jobs:
         
         # export symbols
         printf '\nEXPORT_SYMBOL(susfs_is_current_ksu_domain);\nEXPORT_SYMBOL(susfs_is_current_zygote_domain);\nEXPORT_SYMBOL(susfs_is_current_init_domain);\nEXPORT_SYMBOL(ksu_selinux_hide_running)' >> ./common/drivers/kernelsu/selinux/selinux.c
+
+    - name: create_ksu_fragment
+      run: |
+        cd ${{ github.workspace  }}
+
+        cat > ./ksu.fragment << 'EOF'
+        
+        CONFIG_KPM=y
+        CONFIG_KSU_SUSFS=y
+        CONFIG_KSU_TOOLKIT_SUPPORT=y
+        
+        EOF
         
     - name: add_post_defconfig
+      if: false
       run: |
         cd $KERNEL
     
@@ -105,6 +118,7 @@ jobs:
         export SKIP_EXT_MODULES=1
         export SKIP_CP_KERNEL_HDR=1
         export BUILD_CONFIG=common/build.config.gki.aarch64
+        export GKI_BUILD_CONFIG_FRAGMEMT="${{ github.workspace  }}/ksu.fragment"
         
         build/build.sh 2>&1 | tee build.log
   
