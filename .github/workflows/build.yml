@@ -111,6 +111,7 @@ jobs:
         export SKIP_EXT_MODULES=1
         export SKIP_CP_KERNEL_HDR=1
         export GKI_DEFCONFIG_FRAGMENT="${{ github.workspace }}/defconfig_wrapper.sh"
+        export GKI_BUILD_CONFIG_FRAGMENT="${{ github.workspace }}/gki_build_overrides.fragment"
         export BUILD_CONFIG=common/build.config.gki.aarch64
         
         build/build.sh 2>&1 | tee build.log
