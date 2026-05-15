@@ -57,15 +57,10 @@ jobs:
         
         cd ./susfs4ksu
         
-        #cp ./kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ../KernelSU
-        
         cp -r ./kernel_patches/50_add_susfs_in_gki-android13-5.10.patch ../common/
         
         cp -r ./kernel_patches/fs/* ../common/fs/
         cp -r ./kernel_patches/include/linux/* ../common/include/linux/
-        
-        #cd ../KernelSU
-        #patch -p1 < 10_enable_susfs_for_ksu.patch
         
         cd ../common
         
@@ -100,15 +95,17 @@ jobs:
       run: |
         cd $KERNEL
     
+        sed -i '/^POST_DEFCONFIG_CMDS=/d' ./common/build.config.gki.aarch64
+  
         cat >> ./common/build.config.gki.aarch64 << 'EOF'
-        POST_DEFCONFIG_CMDS='${ROOT_DIR}/common/scripts/config --file ${OUT_DIR}/.config \
-            -e CONFIG_KSU_SUSFS \
-            -e CONFIG_KSU_TOOLKIT_SUPPORT \
-            -e CONFIG_KPM && \
-            make -C ${ROOT_DIR}/common O=${OUT_DIR} olddefconfig'
+        POST_DEFCONFIG_CMDS="${ROOT_DIR}/common/scripts/config \
+          --file ${OUT_DIR}/.config \
+          -e KSU_SUSFS \
+          -e KSU_TOOLKIT_SUPPORT \
+          -e KPM"
         EOF
     
-        tail -5 "./common/build.config.gki.aarch64"
+        grep -A 5 "POST_DEFCONFIG_CMDS" ./common/build.config.gki.aarch64
     
     - name: build_compile
       run: |
