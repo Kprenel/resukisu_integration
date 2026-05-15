@@ -110,10 +110,10 @@ jobs:
     
         echo "=== Verificando se o fragment existe ==="
 
-        ls -la "${{ github.workspace }}/kernelsu_fragment.config"
+        ls -la "${{ github.workspace }}/ksu.fragment"
     
         echo "=== Conteúdo do fragment ==="
-        cat "${{ github.workspace }}/kernelsu_fragment.config"
+        cat "${{ github.workspace }}/ksu.fragment"
     
         echo "=== Verificando build.config ==="
         grep -A 5 "GKI_BUILD_CONFIG_FRAGMENT" ./common/build.config.gki.aarch64 || echo "Não encontrado"
