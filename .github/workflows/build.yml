@@ -86,15 +86,7 @@ jobs:
         cd $KERNEL
         
         # export symbols
-        cat >> ./common/drivers/kernelsu/selinux/selinux.c << 'EOF'
-        
-        EXPORT_SYMBOL(susfs_is_current_ksu_domain);
-        EXPORT_SYMBOL(susfs_is_current_zygote_domain);
-        EXPORT_SYMBOL(susfs_is_current_init_domain);
-        EXPORT_SYMBOL(ksu_selinux_hide_running);
-        EXPORT_SYMBOL(fake_state);
-        
-        EOF
+        printf '\nEXPORT_SYMBOL(susfs_is_current_ksu_domain);\nEXPORT_SYMBOL(susfs_is_current_zygote_domain);\nEXPORT_SYMBOL(susfs_is_current_init_domain);\nEXPORT_SYMBOL(ksu_selinux_hide_running);\nEXPORT_SYMBOL(fake_state);\n' >> ./common/drivers/kernelsu/selinux/selinux.c
         
     - name: configure_build_cmds
       run: |
