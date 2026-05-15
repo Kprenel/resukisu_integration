@@ -82,14 +82,7 @@ jobs:
         echo 'CFLAGS_susfs.o += -Wno-unused-function -Wno-unused-variable' >> ./common/fs/Makefile
         
         # export symbols
-        cat >> ./common/drivers/kernelsu/selinux/selinux.c << 'EOF'
-        
-        EXPORT_SYMBOL(susfs_is_current_ksu_domain);
-        EXPORT_SYMBOL(susfs_is_current_zygote_domain);
-        EXPORT_SYMBOL(susfs_is_current_init_domain);
-        EXPORT_SYMBOL(ksu_selinux_hide_running);
-        
-        EOF
+        printf '\nEXPORT_SYMBOL(susfs_is_current_ksu_domain);\nEXPORT_SYMBOL(susfs_is_current_zygote_domain);\nEXPORT_SYMBOL(susfs_is_current_init_domain);\nEXPORT_SYMBOL(ksu_selinux_hide_running)' >> ./common/drivers/kernelsu/selinux/selinux.c
         
     - name: add_post_defconfig
       run: |
