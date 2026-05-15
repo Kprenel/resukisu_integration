@@ -140,7 +140,7 @@ jobs:
         export SKIP_EXT_MODULES=1
         export SKIP_CP_KERNEL_HDR=1
         export BUILD_CONFIG=common/build.config.gki.aarch64
-        export GKI_BUILD_CONFIG_FRAGMEMT="${{ github.workspace  }}/ksu.fragment"
+        export GKI_DEFCONFIG_FRAGMENT="${{ github.workspace  }}/ksu.fragment"
         
         build/build.sh 2>&1 | tee build.log
   
