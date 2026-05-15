@@ -45,13 +45,13 @@ jobs:
         
     - name: ksu_integration
       run: |
-        cd "$KERNEL/common"
+        cd $KERNEL/common
         
         curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/susfs-ksud/kernel/setup.sh" | bash
         
     - name: susfs_integration
       run: |
-        cd "$KERNEL"
+        cd $KERNEL
         
         git clone -b gki-android13-5.10 --single-branch https://gitlab.com/simonpunk/susfs4ksu.git
         
@@ -73,16 +73,16 @@ jobs:
         
     - name: fix_wifi
       run: |
-        cd "$KERNEL"
+        cd $KERNEL
         
         rm -rf ./common/android/abi_gki_protected_exports_aarch64
         rm -rf ./common/android/abi_gki_protected_exports_x86_64
         
     - name: fix_erros
       run: |
-        cd "$KERNEL"
-        
-        sed -i 's/vm_flags_clear(new_vma, VM_PAD_MASK);/new_vma->vm_flags \&= ~VM_PAD_MASK;/' ./common/mm/mmap.c
+        cd $KERNEL
+
+        sed -i 's/vm_flags_clear(new_vma, VM_PAD_MASK);/new_vma->vm_flags \&= ~VM_PAD_MASK;/g' ./common/mm/mmap.c
         
         echo 'CFLAGS_susfs.o += -Wno-unused-function -Wno-unused-variable' >> ./common/fs/Makefile
         
@@ -91,7 +91,7 @@ jobs:
         
     - name: add_post_defconfig
       run: |
-        cd "$KERNEL"
+        cd $KERNEL
         
         printf "POST_DEFCONFIG_CMDS='\${ROOT_DIR}/common/scripts/config --file \${OUT_DIR}/.config -e CONFIG_KSU_SUSFS -e CONFIG_KSU_TOOLKIT_SUPPORT -e CONFIG_KPM && make -C \${ROOT_DIR}/common O=\${OUT_DIR} olddefconfig'\n" >> "./common/build.config.gki.aarch64"
         
@@ -99,7 +99,7 @@ jobs:
     
     - name: build_compile
       run: |
-        cd "$KERNEL"
+        cd $KERNEL
         
         set -euo pipefail
         
@@ -107,13 +107,14 @@ jobs:
   
     - name: check_config_after_build
       run: |
-        cd "$KERNEL"
+        cd $KERNEL
         
         grep "KSU\|SUSFS\|KPM" ./out/android13-5.10/common/.config 2>/dev/null || echo "NAO ENCONTRADO"
         
     - name: finde_image
       run: |
-        cd "$KERNEL"
+        cd $KERNEL
+        
         find ./out -name "Image" -o -name "Image.gz" -o -name "Image.lz4" 2>/dev/null
     
     - name: create_anykernel3
