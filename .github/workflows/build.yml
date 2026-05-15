@@ -81,8 +81,16 @@ jobs:
         
         echo 'CFLAGS_susfs.o += -Wno-unused-function -Wno-unused-variable' >> ./common/fs/Makefile
         
-        # export symbols
-        printf '\nEXPORT_SYMBOL(susfs_is_current_ksu_domain);\nEXPORT_SYMBOL(susfs_is_current_zygote_domain);\nEXPORT_SYMBOL(susfs_is_current_init_domain);\nEXPORT_SYMBOL(ksu_selinux_hide_running)' >> ./common/drivers/kernelsu/selinux/selinux.c
+        # export symbols selinux.c
+        cat >> ./common/drivers/kernelsu/selinux/selinux.c << 'EOF'
+        
+        EXPORT_SYMBOL(susfs_is_current_ksu_domain);
+        EXPORT_SYMBOL(susfs_is_current_zygote_domain);
+        EXPORT_SYMBOL(susfs_is_current_init_domain);
+        EXPORT_SYMBOL(ksu_selinux_running);
+        EXPORT_SYMBOL(fake_state);
+        
+        EOF
 
     - name: create_ksu_fragment
       run: |
@@ -95,6 +103,20 @@ jobs:
         CONFIG_KSU_TOOLKIT_SUPPORT=y
         
         EOF
+
+    - name: debug_fragment
+      run: |
+        cd $KERNEL
+    
+        echo "=== Verificando se o fragment existe ==="
+
+        ls -la "${{ github.workspace }}/kernelsu_fragment.config"
+    
+        echo "=== Conteúdo do fragment ==="
+        cat "${{ github.workspace }}/kernelsu_fragment.config"
+    
+        echo "=== Verificando build.config ==="
+        grep -A 5 "GKI_BUILD_CONFIG_FRAGMENT" ./common/build.config.gki.aarch64 || echo "Não encontrado"
         
     - name: add_post_defconfig
       if: false
