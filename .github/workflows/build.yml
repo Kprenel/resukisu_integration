@@ -132,7 +132,7 @@ jobs:
         grep "BBG\|KSU\|SUSFS\|KPM" ./out/android13-5.10/common/.config 2>/dev/null || echo "NAO ENCONTRADO"
         
     - name: finde_image
-      working-directory: ${{ env.KERNEL  }}
+      working-directory: ${{ env.KERNEL }}
       run: |
         find ./out -name "Image" -o -name "Image.gz" -o -name "Image.lz4" 2>/dev/null
     
