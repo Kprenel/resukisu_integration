@@ -73,8 +73,6 @@ jobs:
         
         wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/main/setup.sh | bash
         
-        echo "CONFIG_BBG=y" >> "$WORKSPACE/config.fragment"
-        
         sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/selinux/selinux,baseband_guard/ } }' ./common/security/Kconfig
 
         # verify installation
@@ -134,7 +132,7 @@ jobs:
       run: |
         cd $KERNEL
         
-        grep "KSU\|SUSFS\|KPM" ./out/android13-5.10/common/.config 2>/dev/null || echo "NAO ENCONTRADO"
+        grep "BBG\|KSU\|SUSFS\|KPM" ./out/android13-5.10/common/.config 2>/dev/null || echo "NAO ENCONTRADO"
         
     - name: finde_image
       run: |
