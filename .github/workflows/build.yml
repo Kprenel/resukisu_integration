@@ -49,13 +49,13 @@ jobs:
         git checkout -b android13-5.10-2024-11_r6 FETCH_HEAD
         
     - name: ksu_integration
-      working-directory: $KERNEL/common
+      working-directory: ${{ env.KERNEL }}
       run: |
         
         curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/susfs-ksud/kernel/setup.sh" | bash
         
     - name: susfs_integration
-      working-directory: $KERNEL
+      working-directory: ${{ env.KERNEL }}
       run: |
         git clone -b gki-android13-5.10 --single-branch https://gitlab.com/simonpunk/susfs4ksu.git
         
@@ -71,7 +71,7 @@ jobs:
         patch -p1 < 50_add_susfs_in_gki-android13-5.10.patch
 
     - name: bbg_integration
-      working-directory: $KERNEL
+      working-directory: ${{ env.KERNEL }}
       run: |
         wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/main/setup.sh | bash
         
@@ -87,19 +87,19 @@ jobs:
         fi
      
     - name: fix_wifi
-      working-directory: $KERNEL
+      working-directory: ${{ env.KERNEL }}
       run: |
         rm -rf ./common/android/abi_gki_protected_exports_aarch64
 
     - name: fix_flags
-      working-directory: $KERNEL
+      working-directory: ${{ env.KERNEL }}
       run: |
         sed -i 's/vm_flags_clear(new_vma,VM_PAD_MASK);/new_vma->vm_flags \&= ~VM_PAD_MASK;/g' ./common/mm/mmap.c
 
         echo 'CFLAGS_susfs.o += -Wno-unused-function -Wno-unused-variable' >> ./common/fs/Makefile
         
     - name: fix_symbols
-      working-directory: $KERNEL
+      working-directory: ${{ env.KERNEL }}
       run: |
         # export symbols
         printf '\nEXPORT_SYMBOL(susfs_is_current_ksu_domain);\nEXPORT_SYMBOL(susfs_is_current_zygote_domain);\nEXPORT_SYMBOL(susfs_is_current_init_domain);\nEXPORT_SYMBOL(ksu_selinux_hide_running);\nEXPORT_SYMBOL(fake_state);\n' >> ./common/drivers/kernelsu/selinux/selinux.c
@@ -111,7 +111,7 @@ jobs:
         cat "$WORKSPACE/defconfig_wrapper.sh"
     
     - name: build_compile
-      working-directory: $KERNEL
+      working-directory: ${{ env.KERNEL }}
       run: |
         set -euo pipefail
         
@@ -127,7 +127,7 @@ jobs:
         build/build.sh 2>&1 | tee build.log
   
     - name: check_config_after_build
-      working-directory: $KERNEL
+      working-directory: ${{ env.KERNEL }}
       run: |
         grep "BBG\|KSU\|SUSFS\|KPM" ./out/android13-5.10/common/.config 2>/dev/null || echo "NAO ENCONTRADO"
         
