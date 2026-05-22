@@ -12,6 +12,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        shell: bash
+
     steps:
     - uses: actions/checkout@v4
 
@@ -45,15 +49,14 @@ jobs:
         git checkout -b android13-5.10-2024-11_r6 FETCH_HEAD
         
     - name: ksu_integration
+      working-directory: $KERNEL/common
       run: |
-        cd $KERNEL/common
         
         curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/susfs-ksud/kernel/setup.sh" | bash
         
     - name: susfs_integration
+      working-directory: $KERNEL
       run: |
-        cd $KERNEL
-        
         git clone -b gki-android13-5.10 --single-branch https://gitlab.com/simonpunk/susfs4ksu.git
         
         cd ./susfs4ksu
@@ -68,9 +71,8 @@ jobs:
         patch -p1 < 50_add_susfs_in_gki-android13-5.10.patch
 
     - name: bbg_integration
+      working-directory: $KERNEL
       run: |
-        cd $KERNEL
-        
         wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/main/setup.sh | bash
         
         sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/selinux/selinux,baseband_guard/ } }' ./common/security/Kconfig
@@ -85,23 +87,20 @@ jobs:
         fi
      
     - name: fix_wifi
+      working-directory: $KERNEL
       run: |
-        cd $KERNEL
-        
         rm -rf ./common/android/abi_gki_protected_exports_aarch64
 
     - name: fix_flags
+      working-directory: $KERNEL
       run: |
-        cd $KERNEL
-        
         sed -i 's/vm_flags_clear(new_vma,VM_PAD_MASK);/new_vma->vm_flags \&= ~VM_PAD_MASK;/g' ./common/mm/mmap.c
 
         echo 'CFLAGS_susfs.o += -Wno-unused-function -Wno-unused-variable' >> ./common/fs/Makefile
         
     - name: fix_symbols
+      working-directory: $KERNEL
       run: |
-        cd $KERNEL
-        
         # export symbols
         printf '\nEXPORT_SYMBOL(susfs_is_current_ksu_domain);\nEXPORT_SYMBOL(susfs_is_current_zygote_domain);\nEXPORT_SYMBOL(susfs_is_current_init_domain);\nEXPORT_SYMBOL(ksu_selinux_hide_running);\nEXPORT_SYMBOL(fake_state);\n' >> ./common/drivers/kernelsu/selinux/selinux.c
         
@@ -112,9 +111,8 @@ jobs:
         cat "$WORKSPACE/defconfig_wrapper.sh"
     
     - name: build_compile
+      working-directory: $KERNEL
       run: |
-        cd $KERNEL
-        
         set -euo pipefail
         
         export SKIP_MRPROPER=1
@@ -129,21 +127,17 @@ jobs:
         build/build.sh 2>&1 | tee build.log
   
     - name: check_config_after_build
+      working-directory: $KERNEL
       run: |
-        cd $KERNEL
-        
         grep "BBG\|KSU\|SUSFS\|KPM" ./out/android13-5.10/common/.config 2>/dev/null || echo "NAO ENCONTRADO"
         
     - name: finde_image
+      working-directory: $KERNEL
       run: |
-        cd $KERNEL
-        
         find ./out -name "Image" -o -name "Image.gz" -o -name "Image.lz4" 2>/dev/null
     
     - name: create_anykernel3
       run: |
-        cd $WORKSPACE
-        
         git clone https://github.com/osm0sis/AnyKernel3 anykernel3
 
         cp "$KERNEL/out/android13-5.10/dist/Image" ./anykernel3/
