@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 env:
-  WORKSPACE: ${{ github.workspace  }}
+  WORKSPACE: ${{ github.workspace }}
   KERNEL: "${{ github.workspace }}/kernel"
 
 jobs:
@@ -66,7 +66,26 @@ jobs:
         cd ../common
         
         patch -p1 < 50_add_susfs_in_gki-android13-5.10.patch
+
+    - name: bbg_integration
+      run: |
+        cd $KERNEL
         
+        wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/main/setup.sh | bash
+        
+        echo "CONFIG_BBG=y" >> "$WORKSPACE/config.fragment"
+        
+        sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/selinux/selinux,baseband_guard/ } }' ./common/security/Kconfig
+
+        # verify installation
+        if grep -q "baseband_guard" ./common/security/Kconfig; then
+          echo "✓ SUCCESS: baseband_guard found in common/security/Kconfig"
+          grep -n "baseband_guard" ./common/security/Kconfig || true
+        else
+          echo "✗ FAILED: baseband_guard not found in common/security/Kconfig"
+          exit 1
+        fi
+     
     - name: fix_wifi
       run: |
         cd $KERNEL
@@ -135,13 +154,13 @@ jobs:
 
         cd anykernel3
 
-        zip -r9 ../a13-5.10.223-2024-11-anykernel3 . -x "*.git*"
+        zip -r9 ../anykernel3 . -x "*.git*"
         
     - name: upload_anykernel3
       uses: actions/upload-artifact@v4
       with:
         name: a13-5.10.223-2024-11-anykernel3
-        path: ${{ github.workspace  }}/a13-5.10.223-2024-11-anykernel3.zip
+        path: ${{ github.workspace  }}/anykernel3.zip
         compression-level: 0
     
 
