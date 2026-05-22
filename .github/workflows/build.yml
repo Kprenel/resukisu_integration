@@ -154,13 +154,13 @@ jobs:
 
         cd anykernel3
 
-        zip -r9 ../anykernel3 . -x "*.git*"
+        zip -r9 ../ReSukiSU-a13-5.10.223-anykernel3.zip . -x "*.git*"
         
     - name: upload_anykernel3
       uses: actions/upload-artifact@v4
       with:
         name: a13-5.10.223-2024-11-anykernel3
-        path: ${{ github.workspace  }}/anykernel3.zip
+        path: "${{ github.workspace }}/ReSukiSU-a13-5.10.223-anykernel3.zip"
         compression-level: 0
     
 
