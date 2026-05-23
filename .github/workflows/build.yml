@@ -119,7 +119,6 @@ jobs:
         export LTO=thin
         export SKIP_EXT_MODULES=1
         export SKIP_CP_KERNEL_HDR=1
-        export LOCALVERSION="-ReSukiSU-a13-[aarch64]"
         export GKI_DEFCONFIG_FRAGMENT="$WORKSPACE/defconfig_wrapper.sh"
         export GKI_BUILD_CONFIG_FRAGMENT="$WORKSPACE/gki_build_overrides.fragment"
         export BUILD_CONFIG=common/build.config.gki.aarch64
