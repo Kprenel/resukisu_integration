@@ -111,11 +111,23 @@ jobs:
         cat $WORKSPACE/defconfig_wrapper.sh
 
     - name: disable_localversion
+      if: false
       working-directory: ${{ env.KERNEL }}
       run: |
         printf '#!/bin/sh\nprintf ""' > ./common/scripts/setlocalversion
 
         cat ./common/scripts/setlocalversion
+
+    - name: set_kernel_version
+      working-directory: ${{ env.KERNEL }}/common
+      run: |
+        tac ./scripts/setlocalversion | awk '!seen && /^echo / {seen=1; next} 1' | tac > ./scripts/setlocalversion.tmp
+
+        mv ./scripts/setlocalversion.tmp ./scripts/setlocalversion
+
+        echo 'echo "_KPv01"' >> ./scripts/setlocalversion
+
+        chmod +x ./scripts/setlocalversion
         
     - name: build_compile
       working-directory: ${{ env.KERNEL }}
