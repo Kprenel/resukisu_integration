@@ -113,7 +113,7 @@ jobs:
     - name: set_custom_localversion
       working-directory: ${{ env.KERNEL }}
       run: |
-        printf '#!/bin/sh\nprintf "-GKI/a13 +_+ (aarch64)"' > ./common/scripts/setlocalversion
+        printf '#!/bin/sh\nprintf "-GKIa13-KP[aarch64]"' > ./common/scripts/setlocalversion
 
         cat ./common/scripts/setlocalversion
         
