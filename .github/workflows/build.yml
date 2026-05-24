@@ -125,7 +125,7 @@ jobs:
 
         mv ./scripts/setlocalversion.tmp ./scripts/setlocalversion
 
-        echo 'echo "_KPv01"' >> ./scripts/setlocalversion
+        echo 'echo "a13-g161803398875_KPv01"' >> ./scripts/setlocalversion
 
         chmod +x ./scripts/setlocalversion
         
@@ -153,6 +153,8 @@ jobs:
 
         # check kernel release
         cat ./out/android13-5.10/common/include/generated/utsrelease.h
+
+        cat ./out/android13-5.10/common/include/config/kernel.release 2>/dev/null || echo "NAO ENCONTRADO"
         
     - name: finde_image
       working-directory: ${{ env.KERNEL }}
