@@ -110,10 +110,10 @@ jobs:
         
         cat $WORKSPACE/defconfig_wrapper.sh
 
-    - name: set_custom_localversion
+    - name: disable_localversion
       working-directory: ${{ env.KERNEL }}
       run: |
-        printf '#!/bin/sh\nprintf "-a13-gki_v0.1-g161803398875-KP"' > ./common/scripts/setlocalversion
+        printf '#!/bin/sh\nprintf ""' > ./common/scripts/setlocalversion
 
         cat ./common/scripts/setlocalversion
         
