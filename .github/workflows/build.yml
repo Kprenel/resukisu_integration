@@ -113,7 +113,7 @@ jobs:
     - name: set_local_version
       working-directory: ${{ env.KERNEL }}
       run: |
-        sed -i 's|filechk_kernel.release = .*|filechk_kernel.release = echo "5.10.223-GKI/a13 +_+ (aarch64)"|' ./common/Makefile
+        sed -i 's|filechk_kernel.release = .*|filechk_kernel.release = echo "5.10.223-GKI-a13-arrch64"|' ./common/Makefile
 
         grep -n "filechk_kernel.release" ./common/Makefile
     
