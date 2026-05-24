@@ -110,12 +110,12 @@ jobs:
         
         cat $WORKSPACE/defconfig_wrapper.sh
 
-    - name: set_local_version
+    - name: disable_setlocalversion
       working-directory: ${{ env.KERNEL }}
       run: |
-        sed -i 's|filechk_kernel.release = .*|filechk_kernel.release = echo "5.10.223-GKI-a13-arrch64"|' ./common/Makefile
+        printf '#!/bin/sh\nprintf ""' > ./common/scripts/setlocalversion
 
-        grep -n "filechk_kernel.release" ./common/Makefile
+        cat ./common/scripts/setlocalversion
     
     - name: build_compile
       working-directory: ${{ env.KERNEL }}
@@ -137,7 +137,7 @@ jobs:
     - name: check_config_after_build
       working-directory: ${{ env.KERNEL }}
       run: |
-        grep "BBG\|KSU\|KPM" ./out/android13-5.10/common/.config 2>/dev/null
+        grep "LOCALVERSION\|BBG\|KSU\|KPM" ./out/android13-5.10/common/.config 2>/dev/null
         
     - name: finde_image
       working-directory: ${{ env.KERNEL }}
