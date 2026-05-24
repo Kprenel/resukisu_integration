@@ -110,10 +110,10 @@ jobs:
         
         cat $WORKSPACE/defconfig_wrapper.sh
 
-    - name: disable_setlocalversion
+    - name: set_custom_localversion
       working-directory: ${{ env.KERNEL }}
       run: |
-        printf '#!/bin/sh\nprintf ""' > ./common/scripts/setlocalversion
+        printf '#!/bin/sh\nprintf "_GKI-a13[aarch64]"' > ./common/scripts/setlocalversion
 
         cat ./common/scripts/setlocalversion
     
@@ -138,6 +138,12 @@ jobs:
       working-directory: ${{ env.KERNEL }}
       run: |
         grep "LOCALVERSION\|BBG\|KSU\|KPM" ./out/android13-5.10/common/.config 2>/dev/null
+
+        # check kernel release
+
+        cat ./out/android13-5.10/common/include/generated/utsrelease.h
+
+        cat ./out/android13-5.10/common/include/config/kernel.release 2>/dev/null || echo "NAO ENCONTRADO"
         
     - name: finde_image
       working-directory: ${{ env.KERNEL }}
