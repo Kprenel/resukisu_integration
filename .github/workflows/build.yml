@@ -110,14 +110,6 @@ jobs:
         
         cat $WORKSPACE/defconfig_wrapper.sh
 
-    - name: disable_localversion
-      if: false
-      working-directory: ${{ env.KERNEL }}
-      run: |
-        printf '#!/bin/sh\nprintf ""' > ./common/scripts/setlocalversion
-
-        cat ./common/scripts/setlocalversion
-
     - name: set_kernel_version
       working-directory: ${{ env.KERNEL }}/common
       run: |
@@ -125,7 +117,7 @@ jobs:
 
         mv ./scripts/setlocalversion.tmp ./scripts/setlocalversion
 
-        echo 'echo "a13-g161803398875_KPv01"' >> ./scripts/setlocalversion
+        echo 'echo "-a13.gki-g161803398875_KPv0.1-[arrch64]"' >> ./scripts/setlocalversion
 
         chmod +x ./scripts/setlocalversion
         
