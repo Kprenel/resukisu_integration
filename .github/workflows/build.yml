@@ -56,10 +56,6 @@ jobs:
     - name: susfs_integration
       working-directory: ${{ env.KERNEL }}
       run: |
-        echo "[ ==  check susfs driver == ]"
-
-        grep -rn "susfs" ./common/drivers/kernelsu/Kconfig 2>/dev/null | head -5 || echo "not found"
-        
         git clone -b gki-android13-5.10 --single-branch https://gitlab.com/simonpunk/susfs4ksu.git
         
         cd ./susfs4ksu
@@ -104,12 +100,7 @@ jobs:
     - name: fix_export_symbols
       working-directory: ${{ env.KERNEL }}
       run: |
-        printf '\nEXPORT_SYMBOL(%s);\n' \
-          "ksu_selinux_hide_enabled" \
-          "fake_status" \
-          "fake_status_initialize_key" \
-          "initialize_fake_status" \
-          >> ./common/drivers/kernelsu/selinux/selinux.c
+        printf '\nEXPORT_SYMBOL(susfs_is_current_ksu_domain);\nEXPORT_SYMBOL(susfs_is_current_zygote_domain);\nEXPORT_SYMBOL(susfs_is_current_init_domain);\nEXPORT_SYMBOL(ksu_selinux_hide_running);\nEXPORT_SYMBOL(fake_state);\nEXPORT_SYMBOL(ksu_selinux_hide_enabled)\nEXPORT_SYMBOL(fake_status)\nEXPORT_SYMBOL(fake_status_initialize_key)\nEXPORT_SYMBOL(initialize_fake_status)' >> ./common/drivers/kernelsu/selinux/selinux.c
         
     - name: configure_build_cmds
       run: |
