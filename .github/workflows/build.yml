@@ -100,7 +100,7 @@ jobs:
     - name: fix_export_symbols
       working-directory: ${{ env.KERNEL }}
       run: |
-        grep -rn "^struct page \*fake_status\|^void initialize_fake_status\|^struct static_key_false fake_status_initialize_key" ./common/ 2>/dev/null
+        grep -rn "fake_status\|initialize_fake_status\|initialize_key" ./common/drivers/kernelsu/ 2>/dev/null
         
     - name: configure_build_cmds
       run: |
