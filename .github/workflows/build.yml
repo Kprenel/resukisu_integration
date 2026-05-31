@@ -106,7 +106,7 @@ jobs:
     - name: fix_export_symbols
       working-directory: ${{ env.KERNEL }}
       run: |
-        grep -rn "fake_status\|initialize_fake_status\|initialize_key" ./common/drivers/kernelsu/ 2>/dev/null
+        echo ":)"
         
     - name: configure_build_cmds
       run: |
@@ -143,18 +143,11 @@ jobs:
         build/build.sh 2>&1 | tee build.log
   
     - name: check_config_after_build
-      if: always()
       working-directory: ${{ env.KERNEL }}
       run: |
-        grep "LOCALVERSION\|BBG\|KSU\|KPM" ./out/android13-5.10/common/.config 2>/dev/null
+        grep "BBG\|KSU\|KPM" ./out/android13-5.10/common/.config 2>/dev/null
 
-        # check kernel release
         cat ./out/android13-5.10/common/include/generated/utsrelease.h
-        
-    - name: finde_image
-      working-directory: ${{ env.KERNEL }}
-      run: |
-        find ./out -name "Image" -o -name "Image.gz" -o -name "Image.lz4" 2>/dev/null
     
     - name: create_anykernel3
       run: |
