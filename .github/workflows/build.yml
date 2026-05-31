@@ -116,7 +116,7 @@ jobs:
 
         mv ./scripts/setlocalversion.tmp ./scripts/setlocalversion
 
-        echo 'echo "-a13.GKI[v0.1]-g16180339-(arrch64)"' >> ./scripts/setlocalversion
+        echo 'echo "-a13.GKI[v0.1]-g16180339-[arrch64]"' >> ./scripts/setlocalversion
 
         chmod +x ./scripts/setlocalversion
         
