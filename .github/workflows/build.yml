@@ -51,7 +51,6 @@ jobs:
     - name: ksu_integration
       working-directory: ${{ env.KERNEL }}
       run: |
-        
         curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/susfs-ksud/kernel/setup.sh" | bash
         
     - name: susfs_integration
@@ -61,7 +60,7 @@ jobs:
         
         cd ./susfs4ksu
         
-        cp -r ./kernel_patches/50_add_susfs_in_gki-android13-5.10.patch ../common/
+        cp ./kernel_patches/50_add_susfs_in_gki-android13-5.10.patch ../common/
         
         cp -r ./kernel_patches/fs/* ../common/fs/
         cp -r ./kernel_patches/include/linux/* ../common/include/linux/
@@ -117,7 +116,7 @@ jobs:
 
         mv ./scripts/setlocalversion.tmp ./scripts/setlocalversion
 
-        echo 'echo "-a13.gki-g161803398875_KPv0.1-[arrch64]"' >> ./scripts/setlocalversion
+        echo 'echo "-a13.GKI[v0.1]-g16180339-(arrch64)"' >> ./scripts/setlocalversion
 
         chmod +x ./scripts/setlocalversion
         
@@ -145,8 +144,6 @@ jobs:
 
         # check kernel release
         cat ./out/android13-5.10/common/include/generated/utsrelease.h
-
-        cat ./out/android13-5.10/common/include/config/kernel.release 2>/dev/null || echo "NAO ENCONTRADO"
         
     - name: finde_image
       working-directory: ${{ env.KERNEL }}
@@ -163,13 +160,13 @@ jobs:
 
         cd anykernel3
 
-        zip -r9 ../resukisu-a13-5.10.223-anykernel3.zip . -x "*.git*"
+        zip -r9 ../resukisu-a13-5.10.223-2024-11-anykernel3.zip . -x "*.git*"
         
     - name: upload_anykernel3
       uses: actions/upload-artifact@v4
       with:
         name: resukisu-a13-5.10.223.zip
-        path: "${{ github.workspace }}/resukisu-a13-5.10.223-anykernel3.zip"
+        path: "${{ github.workspace }}/resukisu-a13-5.10.223-2024-11-anykernel3.zip"
         compression-level: 0
     
 
