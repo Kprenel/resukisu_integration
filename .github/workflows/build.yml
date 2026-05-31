@@ -51,7 +51,7 @@ jobs:
     - name: ksu_integration
       working-directory: ${{ env.KERNEL }}
       run: |
-        curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/dev/kernel/setup.sh" | bash
+        curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/sync-upstream/kernel/setup.sh" | bash
         
     - name: susfs_integration
       working-directory: ${{ env.KERNEL }}
@@ -60,16 +60,16 @@ jobs:
         
         cd ./susfs4ksu
 
-        cp ./kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ../KernelSU/
+        #cp ./kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ../KernelSU/
         
         cp ./kernel_patches/50_add_susfs_in_gki-android13-5.10.patch ../common/
         
         cp -r ./kernel_patches/fs/* ../common/fs/
         cp -r ./kernel_patches/include/linux/* ../common/include/linux/
 
-        cd ../KernelSU
+        #cd ../KernelSU
 
-        patch -p1 < 10_enable_susfs_for_ksu.patch
+        #patch -p1 < 10_enable_susfs_for_ksu.patch
         
         cd ../common
         
