@@ -51,7 +51,7 @@ jobs:
     - name: ksu_integration
       working-directory: ${{ env.KERNEL }}
       run: |
-        curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/susfs-ksud/kernel/setup.sh" | bash
+        curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/dev/kernel/setup.sh" | bash
         
     - name: susfs_integration
       working-directory: ${{ env.KERNEL }}
