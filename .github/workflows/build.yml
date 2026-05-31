@@ -102,13 +102,6 @@ jobs:
       run: |
         grep -rn "ksu_selinux_hide_enabled\|fake_status\|fake_status_initialize_key\|initialize_fake_status" ./common/security/ ./common/drivers/kernelsu/ 2>/dev/null
         
-        printf '\nEXPORT_SYMBOL(%s);\n' \
-          "ksu_selinux_hide_enabled" \
-          "fake_status" \
-          "fake_status_initialize_key" \
-          "initialize_fake_status" \
-          >> ./common/drivers/kernelsu/selinux/selinux.c
-        
     - name: configure_build_cmds
       run: |
         printf "append_cmd POST_DEFCONFIG_CMDS 'if [ -f \"$WORKSPACE/config.fragment\" ]; then \${KERNEL_DIR}/scripts/kconfig/merge_config.sh -m -O \${OUT_DIR} \${OUT_DIR}/.config \"$WORKSPACE/config.fragment\"; fi && (cd \${KERNEL_DIR} && make O=\${OUT_DIR} olddefconfig)'\n" > $WORKSPACE/defconfig_wrapper.sh
