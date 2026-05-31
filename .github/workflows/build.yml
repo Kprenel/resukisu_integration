@@ -75,11 +75,6 @@ jobs:
         
         patch -p1 < 50_add_susfs_in_gki-android13-5.10.patch
 
-    - name: check_susfs_compat
-      working-directory: ${{ env.KERNEL }}
-      run: |
-        grep -rn "KSU_COMPAT_HAS_SUSFS_FEATURE_SELINUX_HIDE" ./common/drivers/kernelsu/ 2>/dev/null
-
     - name: bbg_integration
       working-directory: ${{ env.KERNEL }}
       run: |
@@ -110,7 +105,11 @@ jobs:
     - name: fix_export_symbols
       working-directory: ${{ env.KERNEL }}
       run: |
-        echo ":)"
+        printf 'EXPORT_SYMBOL(%s);\n' \
+          "susfs_is_current_ksu_domain" \
+          "susfs_is_current_zygote_domain" \
+          "susfs_is_current_init_domain" \
+          >> ./common/drivers/kernelsu/selinux/selinux.c
         
     - name: configure_build_cmds
       run: |
