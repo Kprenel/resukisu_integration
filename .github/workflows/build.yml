@@ -105,7 +105,6 @@ jobs:
         echo 'CFLAGS_susfs.o += -Wno-unused-function -Wno-unused-variable' >> ./common/fs/Makefile
         
     - name: fix_export_symbols
-      if: false
       working-directory: ${{ env.KERNEL }}
       run: |
         printf 'EXPORT_SYMBOL(%s);\n' \
