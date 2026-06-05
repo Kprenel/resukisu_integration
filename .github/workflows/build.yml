@@ -84,7 +84,7 @@ jobs:
         
         sed -i '/^config LSM$/,/^help$/{ /^[[:space:]]*default/ { /baseband_guard/! s/selinux/selinux,baseband_guard/ } }' ./common/security/Kconfig
 
-        # check installation
+        # check
         if grep -q "baseband_guard" ./common/security/Kconfig; then
           echo "✓ baseband_guard found in common/security/Kconfig"
         else
