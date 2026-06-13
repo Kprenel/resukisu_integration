@@ -40,7 +40,7 @@ jobs:
     
     - name: install_packages
       run: |
-        sudo apt-get install -y git-core gnupg flex bison build-essential zip curl zlib1g-dev libc6-dev-i386 libxml2-utils xsltproc unzip fontconfig repo
+        sudo apt-get install -y git-core gnupg flex bison build-essential zip curl zlib1g-dev libc6-dev-i386 libxml2-utils xsltproc unzip fontconfig ccache repo
           
     - name: clone_kernel_source
       run: |
@@ -52,7 +52,7 @@ jobs:
 
         cd ./common
 
-        git fetch https://android.googlesource.com/kernel/common refs/tags/android13-5.10-2024-11_r6
+        git fetch --depth=1 https://android.googlesource.com/kernel/common refs/tags/android13-5.10-2024-11_r6
 
         git checkout -b android13-5.10-2024-11_r6 FETCH_HEAD
         
