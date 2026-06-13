@@ -29,6 +29,14 @@ jobs:
         large-packages: true
         docker-images: true
         swap-storage: true
+
+    - name: cache_ccache
+      uses: actions/cache@v4
+      with:
+        path: ~/.ccache
+        key: ccache-${{ runner.os }}-${{ github.sha }}
+        restore-keys: |
+          ccache-${{ runner.os }}-
     
     - name: install_packages
       run: |
@@ -51,7 +59,7 @@ jobs:
     - name: ksu_setup
       working-directory: ${{ env.KERNEL }}
       run: |
-        curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/dev/kernel/setup.sh" | bash
+        curl -LSs "https://raw.githubusercontent.com/ReSukiSU/ReSukiSU/sync-upstream/kernel/setup.sh" | bash
         
     - name: susfs_setup
       working-directory: ${{ env.KERNEL }}
@@ -144,6 +152,12 @@ jobs:
         export GKI_DEFCONFIG_FRAGMENT="$WORKSPACE/defconfig_wrapper.sh"
         export GKI_BUILD_CONFIG_FRAGMENT="$WORKSPACE/gki_build_overrides.fragment"
         export BUILD_CONFIG=common/build.config.gki.aarch64
+
+        export CCACHE_DIR=~/.ccache
+        export CC="ccache clang"
+        export HOSTCXX="ccache clang++"
+    
+        ccache -M 5G
         
         build/build.sh 2>&1 | tee build.log
   
