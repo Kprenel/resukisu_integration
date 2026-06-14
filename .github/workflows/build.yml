@@ -12,6 +12,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     defaults:
       run:
         shell: bash
@@ -203,8 +206,11 @@ jobs:
           - tested: a14 5g
       
           ## installation 
-          extract the zip and flash ak3 using horizon kernel flasher
+          flash ak3 using horizon kernel flasher
           https://github.com/libxzr/HorizonKernelFlasher/releases
+
+          ## manager
+          https://nightly.link/ReSukiSU/ReSukiSU/workflows/build-manager/main/Manager-release.zip
           
     
 
