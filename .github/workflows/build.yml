@@ -206,9 +206,6 @@ jobs:
           ## installation 
           flash ak3 using horizon kernel flasher
           https://github.com/libxzr/HorizonKernelFlasher/releases
-
-          ## manager
-          https://nightly.link/ReSukiSU/ReSukiSU/workflows/build-manager/main/Manager-release.zip
           
     
 
