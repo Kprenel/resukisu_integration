@@ -72,8 +72,6 @@ jobs:
         cd ./susfs4ksu
 
         #cp ./kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch ../KernelSU/
-
-        #git checkout 604ea60a49f434f3b08041d9b9338ad4a99ea58d -- kernel_patches/50_add_susfs_in_gki-android13-5.10.patch
         
         cp ./kernel_patches/50_add_susfs_in_gki-android13-5.10.patch ../common/
         
