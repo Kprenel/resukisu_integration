@@ -143,8 +143,6 @@ jobs:
         git add -A
 
         git commit -m "apply patches"
-
-        git tag -f "android13-5.10-2024-11_r6"
         
     - name: make_image
       working-directory: ${{ env.KERNEL }}
