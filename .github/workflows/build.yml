@@ -150,6 +150,10 @@ jobs:
         set -euo pipefail
         
         export LTO=thin
+
+        export SKIP_EXT_MODULES=1
+        export SKIP_CP_KERNEL_HDR=1
+        export SKIP_MRPROPER=1
         
         export GKI_DEFCONFIG_FRAGMENT="$WORKSPACE/defconfig_wrapper.sh"
         export GKI_BUILD_CONFIG_FRAGMENT="$WORKSPACE/gki_build_overrides.fragment"
