@@ -161,6 +161,7 @@ jobs:
 
         export CCACHE_DIR=~/.ccache
         export CC="ccache clang"
+        export HOSTCC="ccache clang"
         export HOSTCXX="ccache clang++"
     
         ccache -M 5G
