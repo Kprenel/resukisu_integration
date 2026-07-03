@@ -81,7 +81,6 @@ jobs:
         patch -p1 < 50_add_susfs_in_gki-android13-5.10.patch
 
     - name: bbg_setup
-      if: false
       working-directory: ${{ env.KERNEL }}
       run: |
         wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/main/setup.sh | bash
@@ -180,6 +179,11 @@ jobs:
       working-directory: ${{ env.WORKSPACE }}
       run: |
         git clone https://github.com/osm0sis/AnyKernel3 anykernel3
+
+        # downgrade
+        cd ./anykernel3 && git checkout dca9dc370838d919d56c1f59ec78b27a14a72c68
+
+        cd ../
 
         cp $KERNEL/out/android13-5.10/dist/Image ./anykernel3/
 
