@@ -81,6 +81,7 @@ jobs:
         patch -p1 < 50_add_susfs_in_gki-android13-5.10.patch
 
     - name: bbg_setup
+      if: false
       working-directory: ${{ env.KERNEL }}
       run: |
         wget -O- https://github.com/vc-teahouse/Baseband-guard/raw/main/setup.sh | bash
