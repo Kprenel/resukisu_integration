@@ -210,7 +210,8 @@ jobs:
           ## ReSukiSU + SUSFS 2.2.0 + Baseband Guard
       
           - Kernel: 5.10.223 (android13-2024-11_r6)
-          - KernelSU: ReSukiSU (main/34992/2)
+          - KernelSU: ReSukiSU (main)
+          - driver: 35005
 
           - tested: a14 5g
       
