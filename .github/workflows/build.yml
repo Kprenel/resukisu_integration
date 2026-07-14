@@ -211,12 +211,13 @@ jobs:
       
           - Kernel: 5.10.223 (android13-2024-11_r6)
           - KernelSU: ReSukiSU (main)
-          - driver: 35005
+          - driver: 35012
 
           - tested: a14 5g
       
           ## installation 
           flash ak3 using horizon kernel flasher
+          
           https://github.com/libxzr/HorizonKernelFlasher/releases
           
     
